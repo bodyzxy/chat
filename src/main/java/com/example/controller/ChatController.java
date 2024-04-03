@@ -24,6 +24,16 @@ public class ChatController {
      */
     @GetMapping("/")
     public String chat(@RequestParam String message){
-        return chatService.chatByPdf(message);
+        return chatService.chat(message);
+    }
+
+    /**
+     * 通过文件内容聊天
+     * @param message
+     * @return
+     */
+    @GetMapping("/file")
+    public String chatFile(@RequestParam String message){
+        return chatService.chat(message);
     }
 }

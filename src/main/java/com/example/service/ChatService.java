@@ -40,7 +40,7 @@ public class ChatService {
      * @param message
      * @return
      */
-    public String chatByPdf(String message) {
+    public String chat(String message) {
         //根据文本内容进行相似性检索
         List<Document> documents = vectorStore.similaritySearch(message);
         //将Document列表中每个conntent内容进行拼接
@@ -53,4 +53,5 @@ public class ChatService {
         ChatResponse call = chatClient.call(new Prompt(List.of(systemMessage,userMessage)));
         return call.getResult().getOutput().getContent();
     }
+
 }
