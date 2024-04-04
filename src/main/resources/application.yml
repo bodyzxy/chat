@@ -1,0 +1,17 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: caht
+  ai:
+    openai:
+      api-key: sk-W0KF2fh5BTxxxxxxxxxxxxc03B079C94956CfD4B5
+      base-url: xxxxxxxxxx
+      chat:
+        options:
+          temperature: 0.7
+  datasource:
+    username: postgres
+    password: xxxxxxxx
+    url: jdbc:postgresql://localhost:5432/vector_store
