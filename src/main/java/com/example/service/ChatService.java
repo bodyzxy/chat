@@ -1,17 +1,24 @@
 package com.example.service;
 
+import cn.hutool.http.Header;
+import cn.hutool.http.HttpResponse;
+import cn.hutool.json.JSONUtil;
+import com.example.entity.GenerateImagesRequest;
 import lombok.RequiredArgsConstructor;
+import org.json.JSONObject;
 import org.springframework.ai.chat.ChatClient;
 import org.springframework.ai.chat.ChatResponse;
 import org.springframework.ai.chat.messages.Message;
-import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.SystemPromptTemplate;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import cn.hutool.http.HttpUtil;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -34,6 +41,8 @@ public class ChatService {
 
     private final ChatClient chatClient;
     private final VectorStore vectorStore;
+    @Value("${spring.ai.openai.api-key}")
+    private String defaultApiKey;
 
     /**
      * 通过向量数据库进行检索
@@ -54,4 +63,19 @@ public class ChatService {
         return call.getResult().getOutput().getContent();
     }
 
+    public String aiImage(GenerateImagesRequest generateImagesRequest) {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("prompt", generateImagesRequest.getPrompt());
+        jsonObject.put("n", generateImagesRequest.getNum());
+
+        Map<String, Object> hashMap = new HashMap<>();
+        hashMap.put("Authorization", "Bearer " + defaultApiKey);
+        String url = "https://api.openai.com/v1/images/generations";
+        HttpResponse httpResponse = HttpUtil.createPost(url)
+                .header(Header.AUTHORIZATION, "Bearer " + defaultApiKey)
+                .body(JSONUtil.toJsonStr(jsonObject))
+                .execute();
+        String str = httpResponse.body();
+        return str;
+    }
 }

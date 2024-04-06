@@ -5,13 +5,14 @@ spring:
   application:
     name: caht
   ai:
+    # api和key分享自：https://pgthinker.me/2023/10/03/196/
     openai:
-      api-key: sk-W0KF2fh5BTxxxxxxxxxxxxc03B079C94956CfD4B5
-      base-url: xxxxxxxxxx
+      api-key: sk-W0KF2fh5BTX3fEUvBf1262B948354c03B079C94956CfD4B5
+      base-url: https://api.mnzdna.xyz
       chat:
         options:
           temperature: 0.7
   datasource:
     username: postgres
-    password: xxxxxxxx
+    password: xxxxxxxxx
     url: jdbc:postgresql://localhost:5432/vector_store

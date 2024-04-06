@@ -1,13 +1,14 @@
 package com.example.controller;
 
+import com.example.entity.GenerateImagesRequest;
 import com.example.service.ChatService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @RequestMapping("/api/v1/chat")
 @Slf4j
@@ -35,5 +36,15 @@ public class ChatController {
     @GetMapping("/file")
     public String chatFile(@RequestParam String message){
         return chatService.chat(message);
+    }
+
+    /**
+     * 生成图片
+     * @param generateImagesRequest
+     * @return
+     */
+    @PostMapping("/aiImage")
+    public String aiImage(@RequestBody GenerateImagesRequest generateImagesRequest){
+        return chatService.aiImage(generateImagesRequest);
     }
 }
