@@ -65,6 +65,7 @@ public class ChatService {
 
     public String aiImage(GenerateImagesRequest generateImagesRequest) {
         JSONObject jsonObject = new JSONObject();
+        //此处需要两个参数，传参时JSON可只写这两条数据即可
         jsonObject.put("prompt", generateImagesRequest.getPrompt());
         jsonObject.put("n", generateImagesRequest.getNum());
 
