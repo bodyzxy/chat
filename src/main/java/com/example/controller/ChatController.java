@@ -1,5 +1,6 @@
 package com.example.controller;
 
+import com.example.entity.AiImage;
 import com.example.entity.GenerateImagesRequest;
 import com.example.service.ChatService;
 import lombok.RequiredArgsConstructor;
@@ -46,5 +47,16 @@ public class ChatController {
     @PostMapping("/aiImage")
     public String aiImage(@RequestBody GenerateImagesRequest generateImagesRequest){
         return chatService.aiImage(generateImagesRequest);
+    }
+
+    /**
+     * 生成图片spring官网
+     * https://docs.spring.io/spring-ai/reference/api/clients/image/openai-image.html
+     * @param aiImage
+     * @return
+     */
+    @PostMapping("/aiImage2")
+    public String aiImage2(@RequestBody AiImage aiImage){
+        return chatService.aiImage2(aiImage);
     }
 }

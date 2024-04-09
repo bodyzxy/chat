@@ -3,7 +3,9 @@ package com.example.service;
 import cn.hutool.http.Header;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.json.JSONUtil;
+import com.example.entity.AiImage;
 import com.example.entity.GenerateImagesRequest;
+import com.example.entity.OneApi;
 import lombok.RequiredArgsConstructor;
 import org.json.JSONObject;
 import org.springframework.ai.chat.ChatClient;
@@ -13,10 +15,17 @@ import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.SystemPromptTemplate;
 import org.springframework.ai.document.Document;
+import org.springframework.ai.image.ImageClient;
+import org.springframework.ai.image.ImagePrompt;
+import org.springframework.ai.image.ImageResponse;
+import org.springframework.ai.openai.OpenAiImageClient;
+import org.springframework.ai.openai.OpenAiImageOptions;
+import org.springframework.ai.openai.api.OpenAiImageApi;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import cn.hutool.http.HttpUtil;
+import org.springframework.web.client.RestClient;
 
 import java.util.HashMap;
 import java.util.List;
@@ -78,5 +87,29 @@ public class ChatService {
                 .execute();
         String str = httpResponse.body();
         return str;
+    }
+
+    public String aiImage2(AiImage aiImage) {
+        ImageClient imageClient = imageClient();
+        OpenAiImageOptions options = OpenAiImageOptions.builder()
+                .withModel(aiImage.getModel())
+                .withHeight(aiImage.getHeight())
+                .withWidth(aiImage.getWidth())
+                .withResponseFormat(aiImage.getFormat())
+                .build();
+        //绘制图片
+        ImageResponse imageResponse = imageClient.call(new ImagePrompt(aiImage.getPrompt(),options));
+        return imageResponse.getResult().toString();
+
+    }
+
+    private ImageClient imageClient() {
+        OneApi oneApi = new OneApi(); //此处修改为去数据库查询可用的apiKey
+        OpenAiImageApi openAiImageApi = new OpenAiImageApi(
+          oneApi.getBaseUrl(),
+          oneApi.getBaseUrl(),
+                RestClient.builder()
+        );
+        return new OpenAiImageClient(openAiImageApi);
     }
 }
