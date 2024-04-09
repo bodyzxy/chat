@@ -1,6 +1,13 @@
 package com.example;
 
-import lombok.Value;
+import lombok.RequiredArgsConstructor;
+import org.springframework.ai.chat.ChatClient;
+import org.springframework.ai.openai.OpenAiAudioTranscriptionClient;
+import org.springframework.ai.openai.OpenAiAudioTranscriptionOptions;
+import org.springframework.ai.openai.audio.transcription.AudioTranscriptionPrompt;
+import org.springframework.ai.openai.audio.transcription.AudioTranscriptionResponse;
+import org.springframework.ai.openai.OpenAiChatClient;
+import org.springframework.beans.factory.annotation.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.reader.TextReader;
@@ -8,15 +15,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.ai.openai.api.OpenAiAudioApi;
 
 import java.io.IOException;
 
 @SpringBootTest
 @Slf4j
+@RequiredArgsConstructor
 class ChatApplicationTests {
     @Autowired
     private ResourceLoader resourceLoader;
 
+//    protected OpenAiAudioTranscriptionClient transcriptionClient;
+
+    @Value("classpath:/data/LettingGo.flac")
     private Resource resource;
 
     // 在需要的地方加载资源
@@ -31,6 +43,20 @@ class ChatApplicationTests {
         System.out.println(textReader.get());
 
     }
+
+//    @Test
+//    void transcriptionTestWithOptions(){
+//        OpenAiAudioApi.TranscriptResponseFormat responseFormat = OpenAiAudioApi.TranscriptResponseFormat.VTT;
+//        OpenAiAudioTranscriptionOptions transcriptionOptions = OpenAiAudioTranscriptionOptions.builder()
+//                .withLanguage("zh-CN")
+//                .withPrompt("Ask not this, but ask that")
+//                .withTemperature(0f)
+//                .withResponseFormat(responseFormat)
+//                .build();
+//        AudioTranscriptionPrompt transcriptionPrompt = new AudioTranscriptionPrompt(resource,transcriptionOptions);
+//        AudioTranscriptionResponse response = transcriptionClient.call(transcriptionPrompt);
+//        System.out.print(response.getResults());
+//    }
     
 
 }

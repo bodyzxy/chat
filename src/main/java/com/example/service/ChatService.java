@@ -15,14 +15,19 @@ import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.SystemPromptTemplate;
 import org.springframework.ai.document.Document;
+import org.springframework.ai.embedding.EmbeddingClient;
 import org.springframework.ai.image.ImageClient;
 import org.springframework.ai.image.ImagePrompt;
 import org.springframework.ai.image.ImageResponse;
+import org.springframework.ai.openai.OpenAiEmbeddingClient;
 import org.springframework.ai.openai.OpenAiImageClient;
 import org.springframework.ai.openai.OpenAiImageOptions;
+import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.ai.openai.api.OpenAiImageApi;
+import org.springframework.ai.vectorstore.PgVectorStore;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import cn.hutool.http.HttpUtil;
 import org.springframework.web.client.RestClient;
@@ -49,9 +54,11 @@ public class ChatService {
             """;
 
     private final ChatClient chatClient;
-    private final VectorStore vectorStore;
+    private final JdbcTemplate jdbcTemplate;
     @Value("${spring.ai.openai.api-key}")
     private String defaultApiKey;
+    @Value("${spring.ai.openai.base-url}")
+    private String baseUrl;
 
     /**
      * 通过向量数据库进行检索
@@ -59,6 +66,7 @@ public class ChatService {
      * @return
      */
     public String chat(String message) {
+        VectorStore vectorStore = randomGetVectorStore();
         //根据文本内容进行相似性检索
         List<Document> documents = vectorStore.similaritySearch(message);
         //将Document列表中每个conntent内容进行拼接
@@ -70,6 +78,12 @@ public class ChatService {
         //将message对象一并推给CharGPT
         ChatResponse call = chatClient.call(new Prompt(List.of(systemMessage,userMessage)));
         return call.getResult().getOutput().getContent();
+    }
+
+    public VectorStore randomGetVectorStore(){
+        OpenAiApi openAiApi = new OpenAiApi(baseUrl, defaultApiKey);
+        EmbeddingClient openAiEmbeddingClient = new OpenAiEmbeddingClient(openAiApi);
+        return new PgVectorStore(jdbcTemplate,openAiEmbeddingClient);
     }
 
     public String aiImage(GenerateImagesRequest generateImagesRequest) {

@@ -15,7 +15,7 @@
     <description>chat</description>
     <properties>
         <java.version>17</java.version>
-        <spring-ai.version>0.8.0-SNAPSHOT</spring-ai.version>
+        <spring-ai.version>0.8.1</spring-ai.version>
     </properties>
     <dependencies>
         <dependency>
