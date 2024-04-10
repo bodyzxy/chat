@@ -1,12 +1,10 @@
 package com.example;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.ai.chat.ChatClient;
 import org.springframework.ai.openai.OpenAiAudioTranscriptionClient;
 import org.springframework.ai.openai.OpenAiAudioTranscriptionOptions;
 import org.springframework.ai.openai.audio.transcription.AudioTranscriptionPrompt;
 import org.springframework.ai.openai.audio.transcription.AudioTranscriptionResponse;
-import org.springframework.ai.openai.OpenAiChatClient;
 import org.springframework.beans.factory.annotation.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
@@ -26,7 +24,10 @@ class ChatApplicationTests {
     @Autowired
     private ResourceLoader resourceLoader;
 
-//    protected OpenAiAudioTranscriptionClient transcriptionClient;
+    private OpenAiAudioTranscriptionClient transcriptionClient;
+
+    @Value("${spring.ai.openai.api-key}")
+    private String key;
 
     @Value("classpath:/data/LettingGo.flac")
     private Resource resource;
@@ -44,19 +45,21 @@ class ChatApplicationTests {
 
     }
 
-//    @Test
-//    void transcriptionTestWithOptions(){
-//        OpenAiAudioApi.TranscriptResponseFormat responseFormat = OpenAiAudioApi.TranscriptResponseFormat.VTT;
-//        OpenAiAudioTranscriptionOptions transcriptionOptions = OpenAiAudioTranscriptionOptions.builder()
-//                .withLanguage("zh-CN")
-//                .withPrompt("Ask not this, but ask that")
-//                .withTemperature(0f)
-//                .withResponseFormat(responseFormat)
-//                .build();
-//        AudioTranscriptionPrompt transcriptionPrompt = new AudioTranscriptionPrompt(resource,transcriptionOptions);
-//        AudioTranscriptionResponse response = transcriptionClient.call(transcriptionPrompt);
-//        System.out.print(response.getResults());
-//    }
+    @Test
+    void transcriptionTestWithOptions(){
+        OpenAiAudioApi api = new OpenAiAudioApi(key);
+        transcriptionClient = new OpenAiAudioTranscriptionClient(api);
+        OpenAiAudioApi.TranscriptResponseFormat responseFormat = OpenAiAudioApi.TranscriptResponseFormat.VTT;
+        OpenAiAudioTranscriptionOptions transcriptionOptions = OpenAiAudioTranscriptionOptions.builder()
+                .withLanguage("zh-CN")
+                .withPrompt("Ask not this, but ask that")
+                .withTemperature(0f)
+                .withResponseFormat(responseFormat)
+                .build();
+        AudioTranscriptionPrompt transcriptionPrompt = new AudioTranscriptionPrompt(resource,transcriptionOptions);
+        AudioTranscriptionResponse response = transcriptionClient.call(transcriptionPrompt);
+        System.out.print(response.getResults());
+    }
     
 
 }

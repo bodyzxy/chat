@@ -19,19 +19,26 @@ import org.springframework.ai.embedding.EmbeddingClient;
 import org.springframework.ai.image.ImageClient;
 import org.springframework.ai.image.ImagePrompt;
 import org.springframework.ai.image.ImageResponse;
-import org.springframework.ai.openai.OpenAiEmbeddingClient;
-import org.springframework.ai.openai.OpenAiImageClient;
-import org.springframework.ai.openai.OpenAiImageOptions;
+import org.springframework.ai.openai.*;
 import org.springframework.ai.openai.api.OpenAiApi;
+import org.springframework.ai.openai.api.OpenAiAudioApi;
 import org.springframework.ai.openai.api.OpenAiImageApi;
+import org.springframework.ai.openai.audio.transcription.AudioTranscriptionPrompt;
+import org.springframework.ai.openai.audio.transcription.AudioTranscriptionResponse;
 import org.springframework.ai.vectorstore.PgVectorStore;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import cn.hutool.http.HttpUtil;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.core.io.Resource;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,6 +66,7 @@ public class ChatService {
     private String defaultApiKey;
     @Value("${spring.ai.openai.base-url}")
     private String baseUrl;
+    private OpenAiAudioTranscriptionClient transcriptionClient;
 
     /**
      * 通过向量数据库进行检索
@@ -125,5 +133,40 @@ public class ChatService {
                 RestClient.builder()
         );
         return new OpenAiImageClient(openAiImageApi);
+    }
+
+    public String video(MultipartFile file){
+        try {
+            //创建一个
+            Resource resource = resourceCreate(file);
+            OpenAiAudioApi api = new OpenAiAudioApi(defaultApiKey);
+            transcriptionClient = new OpenAiAudioTranscriptionClient(api);
+            //转换成VTT的形式，也可是是其他
+            OpenAiAudioApi.TranscriptResponseFormat transcriptResponseFormat = OpenAiAudioApi.TranscriptResponseFormat.VTT;
+            OpenAiAudioTranscriptionOptions transcriptionOptions = OpenAiAudioTranscriptionOptions.builder()
+                    .withLanguage("zh-CN")
+                    .withTemperature(0f)
+                    .withResponseFormat(transcriptResponseFormat)
+                    .build();
+            AudioTranscriptionPrompt transcriptionPrompt = new AudioTranscriptionPrompt(resource,transcriptionOptions);
+            AudioTranscriptionResponse response = transcriptionClient.call(transcriptionPrompt);
+            return response.toString();
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        return "错误";
+    }
+
+    private Resource resourceCreate(MultipartFile file) throws Exception{
+        //获取文件名
+        String fileName = file.getName();
+        //获取字节数
+        byte[] bytes = file.getBytes();
+        //获取文件名类型
+        String containType = file.getContentType();
+        //创建用于存储文件的虚拟路径
+        Path path = Files.createTempFile("-temp",fileName);
+        Files.write(path,bytes);
+        return new FileSystemResource(path.toFile());
     }
 }

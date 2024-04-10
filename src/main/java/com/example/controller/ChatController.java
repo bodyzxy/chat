@@ -59,4 +59,14 @@ public class ChatController {
     public String aiImage2(@RequestBody AiImage aiImage){
         return chatService.aiImage2(aiImage);
     }
+
+    /**
+     * 将.flac音乐文件转换成VTT
+     * @param file
+     * @return
+     */
+    @PostMapping("/video")
+    public String video(@RequestParam("file") MultipartFile file){
+        return chatService.video(file);
+    }
 }
